@@ -156,7 +156,7 @@ function makeChart(id, type, labels, data, colors) {
       labels,
       datasets: [{
         data,
-        backgroundColor: colors,
+        backgroundColor: colors || PALETTE.slice(0, data.length),
         borderColor: '#0D1B2E',
         borderWidth: isDoughnut ? 3 : 1,
         borderRadius: isDoughnut ? 0 : 6,
@@ -170,7 +170,6 @@ function makeChart(id, type, labels, data, colors) {
         legend: {
           display: true,
           position: isDoughnut ? 'right' : 'bottom',
-          display: isDoughnut ? true : false,
           labels: {
             color: '#A0AEC0',
             font: { family: 'Inter', size: 11 },
@@ -264,32 +263,50 @@ async function loadData() {
   makeChart('chart-padre2', 'doughnut', pad2opts, countAnswers(padres, 'padre_2', pad2opts),
     [COLORS.green, COLORS.yellow, COLORS.red, COLORS.purple]);
 
-// Interpretaciones automáticas
-  function pct(n, total) { return total > 0 ? Math.round((n / total) * 100) : 0; }
-  function setInsight(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
-
-  const p1total = profesores.length / 2 || 1;
-  const wp = countAnswers(profesores, 'prof_1', prof1opts);
-  const dominante1 = prof1opts[wp.indexOf(Math.max(...wp))];
-  setInsight('insight-prof1', `El canal predominante es "${dominante1}". Esto revela cómo fluye la información en la institución.`);
-
-  const p2total = profesores.length / 2 || 1;
-  const dep = countAnswers(profesores, 'prof_2', prof2opts);
-  const siempre = dep[0], aveces = dep[1];
-  setInsight('insight-prof2', `${pct(siempre + aveces, uniqueProf)}% de los profesores depende de Dirección para comunicarse con padres, evidenciando una barrera estructural.`);
-
-  const pad1total = padres.length / 3 || 1;
-  const pc = countAnswers(padres, 'padre_1', pad1opts);
-  const dominante2 = pad1opts[pc.indexOf(Math.max(...pc))];
-  setInsight('insight-padre1', `La mayoría de los padres se informa por "${dominante2}", lo que refleja informalidad en los canales institucionales.`);
-
-  const pad2 = countAnswers(padres, 'padre_2', pad2opts);
-  const noEntrega = pad2[2] + pad2[3];
-  setInsight('insight-padre2', `${pct(noEntrega, uniquePad)}% de los estudiantes no entrega siempre las citaciones, generando una ruptura en la cadena de comunicación.`);  
-// Chart: est_3 (doughnut)
+  // Chart: est_3 (doughnut)
   const est3opts = ['Sí y me ayudó', 'La conozco pero no la uso', 'No sabía que existía'];
   makeChart('chart-est3', 'doughnut', est3opts, countAnswers(estudiantes, 'est_3', est3opts),
     [COLORS.green, COLORS.yellow, COLORS.red]);
+
+  // ── INTERPRETACIONES AUTOMÁTICAS ──
+  function pct(n, d) { return d > 0 ? Math.round((n / d) * 100) : 0; }
+  function setInsight(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+
+  // prof_1
+  const wp = countAnswers(profesores, 'prof_1', prof1opts);
+  const dom1 = prof1opts[wp.indexOf(Math.max(...wp))];
+  setInsight('insight-prof1', uniqueProf > 0
+    ? `El canal predominante es "${dom1}". Esto evidencia dependencia de medios informales para la comunicación institucional.`
+    : 'Sin datos suficientes aún.');
+
+  // prof_2
+  const dep = countAnswers(profesores, 'prof_2', prof2opts);
+  const depPct = pct(dep[0] + dep[1], uniqueProf);
+  setInsight('insight-prof2', uniqueProf > 0
+    ? `${depPct}% de los profesores depende de Dirección para comunicarse con padres, evidenciando una barrera estructural.`
+    : 'Sin datos suficientes aún.');
+
+  // padre_1
+  const pc = countAnswers(padres, 'padre_1', pad1opts);
+  const dom2 = pad1opts[pc.indexOf(Math.max(...pc))];
+  setInsight('insight-padre1', uniquePad > 0
+    ? `La mayoría se informa por "${dom2}". Esto indica el canal de comunicación predominante entre la institución y los padres.`
+    : 'Sin datos suficientes aún.');
+
+  // padre_2
+  const pad2c = countAnswers(padres, 'padre_2', pad2opts);
+  const noEntrega = pct(pad2c[2] + pad2c[3], uniquePad);
+  setInsight('insight-padre2', uniquePad > 0
+    ? `${noEntrega}% de los casos el estudiante no entrega siempre las citaciones, generando una ruptura en la cadena de comunicación.`
+    : 'Sin datos suficientes aún.');
+
+  // est_3
+  const ec = countAnswers(estudiantes, 'est_3', est3opts);
+  const noSabia = pct(ec[2], uniqueEst);
+  const siAyudo = pct(ec[0], uniqueEst);
+  setInsight('insight-est3', uniqueEst > 0
+    ? `${noSabia}% desconocia la plataforma y solo ${siAyudo}% la uso con exito, evidenciando una falla en su difusion institucional.`
+    : 'Sin datos suficientes aun.');
 }
 
 // ─────────────────────────────────────────────
