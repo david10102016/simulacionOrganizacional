@@ -170,7 +170,7 @@ function makeChart(id, type, labels, data, colors) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true,
+  	display: isDoughnut,
           position: isDoughnut ? 'right' : 'bottom',
           labels: {
             color: '#A0AEC0',
