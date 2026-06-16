@@ -206,15 +206,8 @@ function countBy(rows, field, value) {
 }
 
 function countAnswers(rows, pregunta, opciones) {
-  return opciones.map(op =>
-    rows.filter(r =>
-      r.pregunta === pregunta &&
-      r.respuesta != null &&
-      r.respuesta.trim() === op.trim()
-    ).length
-  );
+  return opciones.map(op => rows.filter(r => r.pregunta === pregunta && r.respuesta === op).length);
 }
-
 
 async function loadData() {
   const { data: rows, error } = await db.from('respuestas').select('*').order('created_at', { ascending: false });
