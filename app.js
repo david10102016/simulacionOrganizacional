@@ -156,7 +156,7 @@ function makeChart(id, type, labels, data, colors) {
       labels,
       datasets: [{
         data,
-        backgroundColor: colors || PALETTE.slice(0, data.length),
+        backgroundColor: colors,
         borderColor: '#0D1B2E',
         borderWidth: isDoughnut ? 3 : 1,
         borderRadius: isDoughnut ? 0 : 6,
@@ -218,9 +218,9 @@ async function loadData() {
   const padres      = rows.filter(r => r.rol === 'Padre');
   const estudiantes = rows.filter(r => r.rol === 'Estudiante');
 
-  const uniqueProf = [...new Set(profesores.map(r => r.created_at.slice(0,16)))].length;
-  const uniquePad  = [...new Set(padres.map(r => r.created_at.slice(0,16)))].length;
-  const uniqueEst  = [...new Set(estudiantes.map(r => r.created_at.slice(0,16)))].length;
+  const uniqueProf = [...new Set(profesores.map(r => r.created_at.slice(0,19)))].length;
+  const uniquePad  = [...new Set(padres.map(r => r.created_at.slice(0,19)))].length;
+  const uniqueEst  = [...new Set(estudiantes.map(r => r.created_at.slice(0,19)))].length;
   const total = uniqueProf + uniquePad + uniqueEst;
 
   document.getElementById('kpi-total').textContent = total;
