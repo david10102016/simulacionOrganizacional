@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Proyección</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body">
+
+  <!-- TOP BAR — estilo canal de TV -->
+  <div class="tv-topbar">
+    <div class="tv-topbar__left">
+      <span class="tv-live-dot"></span>
+      <span class="tv-live-label">EN VIVO</span>
+      <span class="tv-title">SIMULADOR DE COMUNICACIÓN ORGANIZACIONAL</span>
+    </div>
+    <div class="tv-topbar__right">
+      <span class="tv-group">GRUPO 3 · UNIVERSIDAD DOMINGO SAVIO</span>
+      <span class="tv-clock" id="tv-clock">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="tv-ticker">
+    <span class="tv-ticker__label">ÚLTIMO REGISTRO</span>
+    <div class="tv-ticker__track" id="ticker-track">Esperando participantes...</div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <main class="dash-main">
+
+    <!-- COLUMN LEFT: KPIs -->
+    <aside class="dash-kpis">
+
+      <div class="kpi-card kpi-total">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="10" cy="9" r="4" stroke="#00C2E0" stroke-width="1.6" fill="none"/>
+          <circle cx="20" cy="9" r="3" stroke="#00C2E0" stroke-width="1.4" fill="none"/>
+          <path d="M3 22c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M20 15c2.5.4 4.5 2.6 4.5 5.3" stroke="#00C2E0" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Total participantes</p>
+          <p class="kpi-value" id="kpi-total">0</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M4 6h20M4 12h14M4 18h16" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="22" cy="20" r="4" fill="#00C2E0" fill-opacity="0.15" stroke="#00C2E0" stroke-width="1.4"/>
+          <path d="M22 18.5v1.5l1 1" stroke="#1A2B4A" stroke-width="1.1" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Profesores</p>
+          <p class="kpi-value" id="kpi-prof">0</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="10" cy="9" r="4" stroke="#00C2E0" stroke-width="1.6" fill="none"/>
+          <circle cx="20" cy="9" r="3" stroke="#00C2E0" stroke-width="1.4" fill="none"/>
+          <path d="M3 22c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M20 15c2.5.4 4.5 2.6 4.5 5.3" stroke="#00C2E0" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Padres de Familia</p>
+          <p class="kpi-value" id="kpi-padre">0</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="9" r="5" stroke="#00C2E0" stroke-width="1.6" fill="none"/>
+          <path d="M6 24c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Estudiantes</p>
+          <p class="kpi-value" id="kpi-est">0</p>
+        </div>
+      </div>
+
+      <!-- Refresh button -->
+      <button class="btn-refresh" onclick="loadData()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13.7 4A6 6 0 1 0 14 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M14 2v4h-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Actualizar datos
+      </button>
+
+    </aside>
+
+    <!-- COLUMN CENTER: CHARTS -->
+    <section class="dash-charts">
+
+      <div class="chart-block">
+        <h2 class="chart-title">Participación por rol</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-roles"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-block">
+        <h2 class="chart-title">¿Cómo reciben comunicados los Profesores?</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-prof1"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-block">
+        <h2 class="chart-title">Dependencia de Dirección — Profesores</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-prof2"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- COLUMN RIGHT: MORE CHARTS -->
+    <section class="dash-charts">
+
+      <div class="chart-block">
+        <h2 class="chart-title">¿Por dónde se enteran los Padres?</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-padre1"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-block">
+        <h2 class="chart-title">¿Los hijos entregan las citaciones?</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-padre2"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-block">
+        <h2 class="chart-title">Conocimiento de plataforma — Estudiantes</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-est3"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- BOTTOM BAR -->
+  <div class="tv-bottombar">
+    <span>Desarrollado por David &nbsp;·&nbsp; WhatsApp: 73138524</span>
+    <span>Grupo 3 | Universidad Domingo Savio — Comunicación Organizacional</span>
+    <span id="resp-count">0 respuestas registradas</span>
+  </div>
+
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
