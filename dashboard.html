@@ -12,7 +12,7 @@
 </head>
 <body class="dashboard-body">
 
-  <!-- TOP BAR — estilo canal de TV -->
+  <!-- TOP BAR -->
   <div class="tv-topbar">
     <div class="tv-topbar__left">
       <span class="tv-live-dot"></span>
@@ -86,7 +86,6 @@
         </div>
       </div>
 
-      <!-- Refresh button -->
       <button class="btn-refresh" onclick="loadData()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M13.7 4A6 6 0 1 0 14 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
@@ -112,6 +111,7 @@
         <div class="chart-wrap">
           <canvas id="chart-prof1"></canvas>
         </div>
+        <p class="chart-insight" id="insight-prof1"></p>
       </div>
 
       <div class="chart-block">
@@ -119,6 +119,7 @@
         <div class="chart-wrap">
           <canvas id="chart-prof2"></canvas>
         </div>
+        <p class="chart-insight" id="insight-prof2"></p>
       </div>
 
     </section>
@@ -131,6 +132,7 @@
         <div class="chart-wrap">
           <canvas id="chart-padre1"></canvas>
         </div>
+        <p class="chart-insight" id="insight-padre1"></p>
       </div>
 
       <div class="chart-block">
@@ -138,6 +140,7 @@
         <div class="chart-wrap">
           <canvas id="chart-padre2"></canvas>
         </div>
+        <p class="chart-insight" id="insight-padre2"></p>
       </div>
 
       <div class="chart-block">
@@ -145,6 +148,7 @@
         <div class="chart-wrap">
           <canvas id="chart-est3"></canvas>
         </div>
+        <p class="chart-insight" id="insight-est3"></p>
       </div>
 
     </section>
@@ -155,7 +159,7 @@
   <div class="tv-bottombar">
     <span>Desarrollado por David &nbsp;·&nbsp; WhatsApp: 73138524</span>
     <span>Grupo 3 | Universidad Domingo Savio — Comunicación Organizacional</span>
-    <span id="resp-count">0 respuestas registradas</span>
+    <span id="resp-count">0 participantes registrados</span>
   </div>
 
   <script src="supabase.js"></script>
