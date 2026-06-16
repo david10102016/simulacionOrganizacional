@@ -264,7 +264,29 @@ async function loadData() {
   makeChart('chart-padre2', 'doughnut', pad2opts, countAnswers(padres, 'padre_2', pad2opts),
     [COLORS.green, COLORS.yellow, COLORS.red, COLORS.purple]);
 
-  // Chart: est_3 (doughnut)
+// Interpretaciones automáticas
+  function pct(n, total) { return total > 0 ? Math.round((n / total) * 100) : 0; }
+  function setInsight(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+
+  const p1total = profesores.length / 2 || 1;
+  const wp = countAnswers(profesores, 'prof_1', prof1opts);
+  const dominante1 = prof1opts[wp.indexOf(Math.max(...wp))];
+  setInsight('insight-prof1', `El canal predominante es "${dominante1}". Esto revela cómo fluye la información en la institución.`);
+
+  const p2total = profesores.length / 2 || 1;
+  const dep = countAnswers(profesores, 'prof_2', prof2opts);
+  const siempre = dep[0], aveces = dep[1];
+  setInsight('insight-prof2', `${pct(siempre + aveces, uniqueProf)}% de los profesores depende de Dirección para comunicarse con padres, evidenciando una barrera estructural.`);
+
+  const pad1total = padres.length / 3 || 1;
+  const pc = countAnswers(padres, 'padre_1', pad1opts);
+  const dominante2 = pad1opts[pc.indexOf(Math.max(...pc))];
+  setInsight('insight-padre1', `La mayoría de los padres se informa por "${dominante2}", lo que refleja informalidad en los canales institucionales.`);
+
+  const pad2 = countAnswers(padres, 'padre_2', pad2opts);
+  const noEntrega = pad2[2] + pad2[3];
+  setInsight('insight-padre2', `${pct(noEntrega, uniquePad)}% de los estudiantes no entrega siempre las citaciones, generando una ruptura en la cadena de comunicación.`);  
+// Chart: est_3 (doughnut)
   const est3opts = ['Sí y me ayudó', 'La conozco pero no la uso', 'No sabía que existía'];
   makeChart('chart-est3', 'doughnut', est3opts, countAnswers(estudiantes, 'est_3', est3opts),
     [COLORS.green, COLORS.yellow, COLORS.red]);
