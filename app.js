@@ -155,6 +155,8 @@ function makeChart(id, type, labels, data, colors) {
     data: {
       labels,
       datasets: [{
+ 	label: '',
+  	data,
         data,
         backgroundColor: colors || PALETTE.slice(0, data.length),
         borderColor: '#0D1B2E',
