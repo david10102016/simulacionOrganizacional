@@ -170,6 +170,7 @@ function makeChart(id, type, labels, data, colors) {
         legend: {
           display: true,
           position: isDoughnut ? 'right' : 'bottom',
+          display: isDoughnut ? true : false,
           labels: {
             color: '#A0AEC0',
             font: { family: 'Inter', size: 11 },
