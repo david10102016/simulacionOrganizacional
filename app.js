@@ -210,11 +210,10 @@ function countAnswers(rows, pregunta, opciones) {
     rows.filter(r =>
       r.pregunta === pregunta &&
       r.respuesta != null &&
-      r.respuesta.trim() === op.trim()
+      r.respuesta.trim().normalize() === op.trim().normalize()
     ).length
   );
 }
-
 
 async function loadData() {
   const { data: rows, error } = await db.from('respuestas').select('*').order('created_at', { ascending: false });
@@ -312,8 +311,8 @@ async function loadData() {
   const noSabia = pct(ec[2], uniqueEst);
   const siAyudo = pct(ec[0], uniqueEst);
   setInsight('insight-est3', uniqueEst > 0
-    ? `${noSabia}% desconocia la plataforma y solo ${siAyudo}% la uso con exito, evidenciando una falla en su difusion institucional.`
-    : 'Sin datos suficientes aun.');
+    ? `${noSabia}% desconocía la plataforma y solo ${siAyudo}% la usó con éxito, evidenciando una falla en su difusión institucional.`
+    : 'Sin datos suficientes aún.');
 }
 
 // ─────────────────────────────────────────────
