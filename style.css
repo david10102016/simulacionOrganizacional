@@ -555,3 +555,12 @@ body {
   .p-card { padding: 1.5rem 1.25rem; }
   .tv-title { display: none; }
 }
+.chart-insight {
+  font-size: 0.72rem;
+  color: #00C2E0;
+  margin-top: 0.4rem;
+  line-height: 1.5;
+  font-family: var(--font-body);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
