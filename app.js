@@ -228,7 +228,7 @@ async function loadData() {
   document.getElementById('kpi-prof').textContent  = uniqueProf;
   document.getElementById('kpi-padre').textContent = uniquePad;
   document.getElementById('kpi-est').textContent   = uniqueEst;
-  document.getElementById('resp-count').textContent = `${rows.length} respuestas registradas`;
+  document.getElementById('resp-count').textContent = `${total} participantes registrados`;
 
   // Ticker
   if (rows.length > 0) {
