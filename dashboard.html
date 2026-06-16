@@ -1,353 +1,168 @@
-// ─────────────────────────────────────────────
-//  PREGUNTAS POR ROL
-// ─────────────────────────────────────────────
-const PREGUNTAS = {
-  Profesor: [
-    {
-      id: 'prof_1',
-      texto: '¿Cómo recibes los comunicados de Dirección?',
-      opciones: ['WhatsApp', 'Comunicado impreso en la pared', 'Ambos', 'No siempre me entero']
-    },
-    {
-      id: 'prof_2',
-      texto: '¿Dependes de Dirección para comunicar algo a los padres?',
-      opciones: ['Siempre', 'A veces', 'Puedo hacerlo directamente']
-    }
-  ],
-  Padre: [
-    {
-      id: 'padre_1',
-      texto: '¿Por dónde te enteras de las actividades del colegio?',
-      opciones: ['WhatsApp', 'Citación en papel', 'Me entero tarde', 'No me entero']
-    },
-    {
-      id: 'padre_2',
-      texto: '¿Tu hijo/a te entrega siempre las citaciones?',
-      opciones: ['Sí siempre', 'A veces', 'Casi nunca', 'Se las guarda']
-    },
-    {
-      id: 'padre_3',
-      texto: '¿Con qué frecuencia vas al colegio a recoger información?',
-      opciones: ['Seguido', 'Solo cuando me llaman', 'Casi nunca']
-    }
-  ],
-  Estudiante: [
-    {
-      id: 'est_1',
-      texto: '¿Cuándo te enteras de tus notas?',
-      opciones: ['Antes del cierre del trimestre', 'Al cierre', 'Cuando ya es tarde', 'No sé cómo consultarlas']
-    },
-    {
-      id: 'est_2',
-      texto: '¿Sientes que las notas son una caja negra durante el año?',
-      opciones: ['Sí, no sé nada hasta el final', 'A veces', 'No, me informan bien']
-    },
-    {
-      id: 'est_3',
-      texto: '¿Has usado la plataforma de gestión escolar para ver tus notas?',
-      opciones: ['Sí y me ayudó', 'La conozco pero no la uso', 'No sabía que existía']
-    }
-  ]
-};
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Proyección</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body">
 
-// ─────────────────────────────────────────────
-//  DETECT PAGE
-// ─────────────────────────────────────────────
-const IS_DASHBOARD = document.body.classList.contains('dashboard-body');
+  <!-- TOP BAR -->
+  <div class="tv-topbar">
+    <div class="tv-topbar__left">
+      <span class="tv-live-dot"></span>
+      <span class="tv-live-label">EN VIVO</span>
+      <span class="tv-title">SIMULADOR DE COMUNICACIÓN ORGANIZACIONAL</span>
+    </div>
+    <div class="tv-topbar__right">
+      <span class="tv-group">GRUPO 3 · UNIVERSIDAD DOMINGO SAVIO</span>
+      <span class="tv-clock" id="tv-clock">--:--:--</span>
+    </div>
+  </div>
 
-// ─────────────────────────────────────────────
-//  PARTICIPANT LOGIC
-// ─────────────────────────────────────────────
-let currentRole = null;
+  <!-- TICKER -->
+  <div class="tv-ticker">
+    <span class="tv-ticker__label">ÚLTIMO REGISTRO</span>
+    <div class="tv-ticker__track" id="ticker-track">Esperando participantes...</div>
+  </div>
 
-function selectRole(role) {
-  currentRole = role;
+  <!-- MAIN GRID -->
+  <main class="dash-main">
 
-  document.getElementById('step-role').classList.remove('active');
-  document.getElementById('step-questions').classList.add('active');
-  document.getElementById('q-role-title').textContent = role === 'Padre' ? 'Padre de Familia' : role;
+    <!-- COLUMN LEFT: KPIs -->
+    <aside class="dash-kpis">
 
-  const container = document.getElementById('questions-container');
-  container.innerHTML = '';
-
-  PREGUNTAS[role].forEach((q, idx) => {
-    const block = document.createElement('div');
-    block.className = 'question-block';
-    block.innerHTML = `
-      <p class="question-text"><span class="q-num">${idx + 1}</span>${q.texto}</p>
-      <div class="options-group" id="opts-${q.id}">
-        ${q.opciones.map(op => `
-          <label class="option-label">
-            <input type="radio" name="${q.id}" value="${op}" />
-            <span class="option-text">${op}</span>
-          </label>
-        `).join('')}
+      <div class="kpi-card kpi-total">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="10" cy="9" r="4" stroke="#00C2E0" stroke-width="1.6" fill="none"/>
+          <circle cx="20" cy="9" r="3" stroke="#00C2E0" stroke-width="1.4" fill="none"/>
+          <path d="M3 22c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M20 15c2.5.4 4.5 2.6 4.5 5.3" stroke="#00C2E0" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Total participantes</p>
+          <p class="kpi-value" id="kpi-total">0</p>
+        </div>
       </div>
-    `;
-    container.appendChild(block);
-  });
-}
 
-function goBack() {
-  currentRole = null;
-  document.getElementById('step-questions').classList.remove('active');
-  document.getElementById('step-role').classList.add('active');
-}
+      <div class="kpi-card">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M4 6h20M4 12h14M4 18h16" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="22" cy="20" r="4" fill="#00C2E0" fill-opacity="0.15" stroke="#00C2E0" stroke-width="1.4"/>
+          <path d="M22 18.5v1.5l1 1" stroke="#1A2B4A" stroke-width="1.1" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Profesores</p>
+          <p class="kpi-value" id="kpi-prof">0</p>
+        </div>
+      </div>
 
-async function submitAnswers() {
-  if (!currentRole) return;
+      <div class="kpi-card">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="10" cy="9" r="4" stroke="#00C2E0" stroke-width="1.6" fill="none"/>
+          <circle cx="20" cy="9" r="3" stroke="#00C2E0" stroke-width="1.4" fill="none"/>
+          <path d="M3 22c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M20 15c2.5.4 4.5 2.6 4.5 5.3" stroke="#00C2E0" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Padres de Familia</p>
+          <p class="kpi-value" id="kpi-padre">0</p>
+        </div>
+      </div>
 
-  const preguntas = PREGUNTAS[currentRole];
-  const rows = [];
+      <div class="kpi-card">
+        <svg class="kpi-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="9" r="5" stroke="#00C2E0" stroke-width="1.6" fill="none"/>
+          <path d="M6 24c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#00C2E0" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div>
+          <p class="kpi-label">Estudiantes</p>
+          <p class="kpi-value" id="kpi-est">0</p>
+        </div>
+      </div>
 
-  for (const q of preguntas) {
-    const selected = document.querySelector(`input[name="${q.id}"]:checked`);
-    if (!selected) {
-      alert('Por favor responde todas las preguntas antes de enviar.');
-      return;
-    }
-    rows.push({ rol: currentRole, pregunta: q.id, respuesta: selected.value });
-  }
+      <button class="btn-refresh" onclick="loadData()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13.7 4A6 6 0 1 0 14 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M14 2v4h-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Actualizar datos
+      </button>
 
-  const btn = document.getElementById('btn-submit');
-  btn.disabled = true;
-  btn.textContent = 'Enviando...';
+    </aside>
 
-  const { error } = await db.from('respuestas').insert(rows);
+    <!-- COLUMN CENTER: CHARTS -->
+    <section class="dash-charts">
 
-  if (error) {
-    alert('Error al enviar. Verifica tu conexión.');
-    btn.disabled = false;
-    btn.textContent = 'Enviar respuestas';
-    return;
-  }
+      <div class="chart-block">
+        <h2 class="chart-title">Participación por rol</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-roles"></canvas>
+        </div>
+      </div>
 
-  document.getElementById('step-questions').classList.remove('active');
-  document.getElementById('step-success').classList.add('active');
-}
+      <div class="chart-block">
+        <h2 class="chart-title">¿Cómo reciben comunicados los Profesores?</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-prof1"></canvas>
+        </div>
+        <p class="chart-insight" id="insight-prof1"></p>
+      </div>
 
-// ─────────────────────────────────────────────
-//  DASHBOARD LOGIC
-// ─────────────────────────────────────────────
-const COLORS = {
-  cyan:    '#00C2E0',
-  blue:    '#1A6BCC',
-  green:   '#22C55E',
-  yellow:  '#F59E0B',
-  purple:  '#8B5CF6',
-  red:     '#EF4444',
-  teal:    '#14B8A6',
-  indigo:  '#6366F1'
-};
-const PALETTE = Object.values(COLORS);
+      <div class="chart-block">
+        <h2 class="chart-title">Dependencia de Dirección — Profesores</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-prof2"></canvas>
+        </div>
+        <p class="chart-insight" id="insight-prof2"></p>
+      </div>
 
-let charts = {};
+    </section>
 
-function makeChart(id, type, labels, data, colors) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return;
-  if (charts[id]) charts[id].destroy();
+    <!-- COLUMN RIGHT: MORE CHARTS -->
+    <section class="dash-charts">
 
-  const isDoughnut = type === 'doughnut';
+      <div class="chart-block">
+        <h2 class="chart-title">¿Por dónde se enteran los Padres?</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-padre1"></canvas>
+        </div>
+        <p class="chart-insight" id="insight-padre1"></p>
+      </div>
 
-  charts[id] = new Chart(ctx, {
-    type,
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: colors || PALETTE.slice(0, data.length),
-        borderColor: '#0D1B2E',
-        borderWidth: isDoughnut ? 3 : 1,
-        borderRadius: isDoughnut ? 0 : 6,
-        hoverOffset: isDoughnut ? 8 : 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: isDoughnut ? 'right' : 'bottom',
-          labels: {
-            color: '#A0AEC0',
-            font: { family: 'Inter', size: 11 },
-            boxWidth: 12,
-            padding: 12
-          }
-        },
-        tooltip: {
-          backgroundColor: '#0D1B2E',
-          titleColor: '#00C2E0',
-          bodyColor: '#E2E8F0',
-          borderColor: '#1E3A5F',
-          borderWidth: 1,
-          padding: 10
-        }
-      },
-      scales: isDoughnut ? {} : {
-        x: {
-          ticks: { color: '#718096', font: { family: 'Inter', size: 11 } },
-          grid: { color: '#1E3A5F' }
-        },
-        y: {
-          ticks: { color: '#718096', font: { family: 'Inter', size: 11 }, stepSize: 1 },
-          grid: { color: '#1E3A5F' },
-          beginAtZero: true
-        }
-      }
-    }
-  });
-}
+      <div class="chart-block">
+        <h2 class="chart-title">¿Los hijos entregan las citaciones?</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-padre2"></canvas>
+        </div>
+        <p class="chart-insight" id="insight-padre2"></p>
+      </div>
 
-function countBy(rows, field, value) {
-  return rows.filter(r => r[field] === value).length;
-}
+      <div class="chart-block">
+        <h2 class="chart-title">Conocimiento de plataforma — Estudiantes</h2>
+        <div class="chart-wrap">
+          <canvas id="chart-est3"></canvas>
+        </div>
+        <p class="chart-insight" id="insight-est3"></p>
+      </div>
 
-function countAnswers(rows, pregunta, opciones) {
-  return opciones.map(op =>
-    rows.filter(r =>
-      r.pregunta === pregunta &&
-      r.respuesta != null &&
-      r.respuesta.trim() === op.trim()
-    ).length
-  );
-}
+    </section>
 
+  </main>
 
-async function loadData() {
-  const { data: rows, error } = await db.from('respuestas').select('*').order('created_at', { ascending: false });
-  if (error || !rows) return;
+  <!-- BOTTOM BAR -->
+  <div class="tv-bottombar">
+    <span>Desarrollado por David &nbsp;·&nbsp; WhatsApp: 73138524</span>
+    <span>Grupo 3 | Universidad Domingo Savio — Comunicación Organizacional</span>
+    <span id="resp-count">0 participantes registrados</span>
+  </div>
 
-  // KPIs
-  const profesores  = rows.filter(r => r.rol === 'Profesor');
-  const padres      = rows.filter(r => r.rol === 'Padre');
-  const estudiantes = rows.filter(r => r.rol === 'Estudiante');
-
-  const uniqueProf = [...new Set(profesores.map(r => r.created_at.slice(0,19)))].length;
-  const uniquePad  = [...new Set(padres.map(r => r.created_at.slice(0,19)))].length;
-  const uniqueEst  = [...new Set(estudiantes.map(r => r.created_at.slice(0,19)))].length;
-  const total = uniqueProf + uniquePad + uniqueEst;
-
-  document.getElementById('kpi-total').textContent = total;
-  document.getElementById('kpi-prof').textContent  = uniqueProf;
-  document.getElementById('kpi-padre').textContent = uniquePad;
-  document.getElementById('kpi-est').textContent   = uniqueEst;
-  document.getElementById('resp-count').textContent = `${total} participantes registrados`;
-
-  // Ticker
-  if (rows.length > 0) {
-    const last = rows[0];
-    document.getElementById('ticker-track').textContent =
-      `${last.rol.toUpperCase()} — ${last.pregunta.replace('_',' ').toUpperCase()}: "${last.respuesta}"`;
-  }
-
-  // Chart: roles (doughnut)
-  makeChart('chart-roles', 'doughnut',
-    ['Profesor', 'Padre de Familia', 'Estudiante'],
-    [uniqueProf, uniquePad, uniqueEst],
-    [COLORS.cyan, COLORS.blue, COLORS.purple]
-  );
-
-  // Chart: prof_1 (bar)
-  const prof1opts = ['WhatsApp', 'Comunicado impreso en la pared', 'Ambos', 'No siempre me entero'];
-  makeChart('chart-prof1', 'bar', prof1opts, countAnswers(profesores, 'prof_1', prof1opts),
-    [COLORS.cyan, COLORS.blue, COLORS.teal, COLORS.red]);
-
-  // Chart: prof_2 (doughnut)
-  const prof2opts = ['Siempre', 'A veces', 'Puedo hacerlo directamente'];
-  makeChart('chart-prof2', 'doughnut', prof2opts, countAnswers(profesores, 'prof_2', prof2opts),
-    [COLORS.red, COLORS.yellow, COLORS.green]);
-
-  // Chart: padre_1 (bar)
-  const pad1opts = ['WhatsApp', 'Citación en papel', 'Me entero tarde', 'No me entero'];
-  makeChart('chart-padre1', 'bar', pad1opts, countAnswers(padres, 'padre_1', pad1opts),
-    [COLORS.cyan, COLORS.blue, COLORS.yellow, COLORS.red]);
-
-  // Chart: padre_2 (doughnut)
-  const pad2opts = ['Sí siempre', 'A veces', 'Casi nunca', 'Se las guarda'];
-  makeChart('chart-padre2', 'doughnut', pad2opts, countAnswers(padres, 'padre_2', pad2opts),
-    [COLORS.green, COLORS.yellow, COLORS.red, COLORS.purple]);
-
-  // Chart: est_3 (doughnut)
-  const est3opts = ['Sí y me ayudó', 'La conozco pero no la uso', 'No sabía que existía'];
-  makeChart('chart-est3', 'doughnut', est3opts, countAnswers(estudiantes, 'est_3', est3opts),
-    [COLORS.green, COLORS.yellow, COLORS.red]);
-
-  // ── INTERPRETACIONES AUTOMÁTICAS ──
-  function pct(n, d) { return d > 0 ? Math.round((n / d) * 100) : 0; }
-  function setInsight(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
-
-  // prof_1
-  const wp = countAnswers(profesores, 'prof_1', prof1opts);
-  const dom1 = prof1opts[wp.indexOf(Math.max(...wp))];
-  setInsight('insight-prof1', uniqueProf > 0
-    ? `El canal predominante es "${dom1}". Esto evidencia dependencia de medios informales para la comunicación institucional.`
-    : 'Sin datos suficientes aún.');
-
-  // prof_2
-  const dep = countAnswers(profesores, 'prof_2', prof2opts);
-  const depPct = pct(dep[0] + dep[1], uniqueProf);
-  setInsight('insight-prof2', uniqueProf > 0
-    ? `${depPct}% de los profesores depende de Dirección para comunicarse con padres, evidenciando una barrera estructural.`
-    : 'Sin datos suficientes aún.');
-
-  // padre_1
-  const pc = countAnswers(padres, 'padre_1', pad1opts);
-  const dom2 = pad1opts[pc.indexOf(Math.max(...pc))];
-  setInsight('insight-padre1', uniquePad > 0
-    ? `La mayoría se informa por "${dom2}". Esto indica el canal de comunicación predominante entre la institución y los padres.`
-    : 'Sin datos suficientes aún.');
-
-  // padre_2
-  const pad2c = countAnswers(padres, 'padre_2', pad2opts);
-  const noEntrega = pct(pad2c[2] + pad2c[3], uniquePad);
-  setInsight('insight-padre2', uniquePad > 0
-    ? `${noEntrega}% de los casos el estudiante no entrega siempre las citaciones, generando una ruptura en la cadena de comunicación.`
-    : 'Sin datos suficientes aún.');
-
-  // est_3
-  const ec = countAnswers(estudiantes, 'est_3', est3opts);
-  const noSabia = pct(ec[2], uniqueEst);
-  const siAyudo = pct(ec[0], uniqueEst);
-  setInsight('insight-est3', uniqueEst > 0
-    ? `${noSabia}% desconocia la plataforma y solo ${siAyudo}% la uso con exito, evidenciando una falla en su difusion institucional.`
-    : 'Sin datos suficientes aun.');
-}
-
-// ─────────────────────────────────────────────
-//  CLOCK — HORA BOLIVIANA (UTC-4)
-// ─────────────────────────────────────────────
-function updateClock() {
-  const el = document.getElementById('tv-clock');
-  if (!el) return;
-  const now = new Date();
-  const bolivia = new Date(now.toLocaleString('en-US', { timeZone: 'America/La_Paz' }));
-  const hh = String(bolivia.getHours()).padStart(2, '0');
-  const mm = String(bolivia.getMinutes()).padStart(2, '0');
-  const ss = String(bolivia.getSeconds()).padStart(2, '0');
-  el.textContent = `${hh}:${mm}:${ss}`;
-}
-
-// ─────────────────────────────────────────────
-//  REALTIME SUBSCRIPTION
-// ─────────────────────────────────────────────
-function subscribeRealtime() {
-  db.channel('respuestas-channel')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'respuestas' }, () => {
-      loadData();
-    })
-    .subscribe();
-}
-
-// ─────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────
-if (IS_DASHBOARD) {
-  updateClock();
-  setInterval(updateClock, 1000);
-  loadData();
-  setInterval(loadData, 30000);
-  subscribeRealtime();
-}
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
